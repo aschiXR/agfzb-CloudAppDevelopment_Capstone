@@ -1,11 +1,11 @@
   applications:
   - name: dealerreiew
     routes:
-      - route: host.domain
+      - route: cplc.eu-gb.mybluemix.net
     memory: 128M
     buildpack: python_buildpack
   - name: dealerreiew-nginx
     routes:
-      - route: host.domain/static
+      - route: cplc.eu-gb.mybluemix.net/static
     memory: 128M
     buildpack: staticfile_buildpack

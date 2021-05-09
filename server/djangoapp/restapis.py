@@ -1,7 +1,8 @@
 import requests
 import json
-# import related models here
+from .models import CarDealer, DealerReview
 from requests.auth import HTTPBasicAuth
+import os
 
 
 # Create a `get_request` to make HTTP GET requests
@@ -9,169 +10,83 @@ from requests.auth import HTTPBasicAuth
 #                                     auth=HTTPBasicAuth('apikey', api_key))
 def get_request(url, **kwargs):
     try:
-        if 'cp_cl_api_key' in kwargs:
-            # Cloudant service rest api request
-            cp_cl_api_key = kwargs['cp_cl_api_key']
-            # prepare payload
-            del kwargs['cp_cl_api_key']
-            # prepare header
-            headers = {'Content-Type': 'application/json', 'cp_api_key': cp_cl_api_key}
-            # call get method
-            response = requests.get(url=url,headers=headers,params=kwargs)
-        elif 'cp_wnlu_api_key' in kwargs:
-            # WNLU service request
-            cp_wnlu_api_key = kwargs['cp_wnlu_api_key']
-            # prepare payload
-            params = dict()
-            params['text'] = kwargs['text']
-            params['version'] = kwargs['version']
-            params['features'] = kwargs['features']
-            params['return_analyzed_text'] = kwargs['return_analyzed_text']
-            if 'language' in kwargs:
-                params['language'] = kwargs['language']
-            # prepare header
-            headers = {'Content-Type': 'application/json'}
-            response = requests.get(url=url,headers=headers,params=kwargs,\
-                    auth=HTTPBasicAuth('apikey',cp_wnlu_api_key))
+        api_key = None
+        if 'api_key' in kwargs:
+            params = {
+                'text': kwargs['text'],
+                'version': '2021-05-09',
+                'features': 'sentiment',
+                'return_analyzed_text': True
+            }
+            api_key = kwargs['api_key']
+            response = requests.get(url, headers={'Content-Type':'application/json'}, params=params, auth=HTTPBasicAuth('apikey', api_key))
         else:
-            # no service key has been specified
-            print("neither cp_cl_api_key nor cp_wnlu_api_key has been specified")
-            return {}
-    except:
-        # if any error occurs print it
-        print("Network exception occurred with GET request!!!")
-        return {}
-    status_code = response.status_code
-    print("get_request: received response with status code {}".format(status_code))
-    json_data = json.loads(response.text)
-    return json_data
-
-
+            response = requests.get(url, headers={'Content-Type':'application/json'}, params=kwargs)
+        status_code = response.status_code
+        if status_code == 200:
+            json_data = json.loads(response.text)
+            return json_data
+        else:
+            print('Response Status Code = ', status_code)
+            return None
+    except Exception as e:
+        print('Error occurred', e)
+        return None
 
 # Create a `post_request` to make HTTP POST requests
 # e.g., response = requests.post(url, params=kwargs, json=payload)
 def post_request(url, json_payload, **kwargs):
     try:
-        if 'cp_cl_api_key' in kwargs:
-            # prepare url to send a post request
-            url = url + "/post"
-            # prepare headers
-            headers = {'Content-Type': 'application/json', 'cp_api_key': kwargs['cp_cl_api_key']}
-            # send request
-            print(json_payload)
-            response = requests.post(url=url, headers=headers, json=json_payload)
+        response = requests.post(url, json=json_payload, params=kwargs)
+        status_code = response.status_code
+        if status_code == 200:
+            json_data = json.loads(response.text)
+            return json_data
         else:
-            # no service key has been specified
-            print("no cp_cl_api_key has been specified")
-            return {}
-    except:
-        # if any error occurs print it
-        print("Network exception occurred with POST request!!!")
-        return {}
-    status_code = response.status_code
-    print("post_request: received response with status code {}".format(status_code))
-    json_data = json.loads(response.text)
-    return json_data  
-
-
+            print('Response Status Code = ', status_code)
+            return None
+    except Exception as e:
+        print('Error occurred', e)
+        return None
 
 # Create a get_dealers_from_cf method to get dealers from a cloud function
 # def get_dealers_from_cf(url, **kwargs):
 # - Call get_request() with specified arguments
 # - Parse JSON results into a CarDealer object list
-def parse_dealers(json_data):
-    car_dealers_list = []
-    if not 'docs' in json_data:
-        return car_dealers_list
-    for dealership in json_data['docs']:
-        dealer_obj = CarDealer(
-           dealership['address'],
-           dealership['city'],
-           dealership['full_name'],
-           dealership['id'],
-           dealership['lat'],
-           dealership['long'],
-           dealership['state'],
-           dealership['st'],
-           dealership['zip']
-        )
-        car_dealers_list.append(dealer_obj)
-    return car_dealers_list
-
-
-def get_dealers_from_cf(url,cp_cl_api_key):
-    json_data = get_request(url=url,cp_cl_api_key=cp_cl_api_key)
-    return parse_dealers(json_data)
-
-def get_dealers_by_state(url,cp_cl_api_key,state):
-    json_data = get_request(url,cp_cl_api_key=cp_cl_api_key,state=state)
-    return parse_dealers(json_data)
-
-def get_dealer_by_id(url,cp_cl_api_key,dealer_id):
-    json_data = get_request(url,cp_cl_api_key=cp_cl_api_key,dealer_id=dealer_id)
-    dealer = parse_dealers(json_data)
-    if len(dealer) != 1:
-        return None
-    return dealer[0]
-
-
+def get_dealers_from_cf(url, **kwargs):
+    results = []
+    json_result = get_request(url, **kwargs)
+    if json_result:
+        if 'entries' in json_result:
+            dealers = json_result['entries']
+            results = [CarDealer(id=dealer['id'], full_name=dealer['full_name'], short_name=dealer['short_name'], city=dealer['city'], address=dealer['address'], state=dealer['state'], st=dealer['st'], zip=dealer['zip'], lat=dealer['lat'], long=dealer['long']) for dealer in dealers]
+    return results
 
 # Create a get_dealer_reviews_from_cf method to get reviews by dealer id from a cloud function
 # def get_dealer_by_id_from_cf(url, dealerId):
 # - Call get_request() with specified arguments
 # - Parse JSON results into a DealerView object list
-def parse_dealer_reviews(json_data):
-    dealer_reviews = []
-    if not 'docs' in json_data:
-        return dealer_reviews
-    for review in json_data['docs']:
-        if review['purchase']:
-            review_obj = DealerReview(
-                review['id'],
-                review['dealership'],
-                review['name'],
-                review['purchase'],
-                review['review'],
-                review['purchase_date'],
-                review['car_make'],
-                review['car_model'],
-                review['car_year']
-            )
-        else:
-            review_obj = DealerReview(
-                review['id'],
-                review['dealership'],
-                review['name'],
-                review['purchase'],
-                review['review']
-            )
-        print("analyzing review sentiments...")
-        review_obj.sentiment = analyze_review_sentiments(review_obj.review)
-        dealer_reviews.append(review_obj)
-    return dealer_reviews
-
-
-def get_dealer_reviews_from_cf(url,cp_cl_api_key,dealer_id):
-    json_data = get_request(url,cp_cl_api_key=cp_cl_api_key,dealerId=dealer_id)
-    return parse_dealer_reviews(json_data)
-
-
+def get_dealer_reviews_from_cf(url, dealer_id):
+    results = []
+    json_result = get_request(url, dealerId=dealer_id)
+    if json_result:
+        if 'entries' in json_result:
+            reviews = json_result['entries']
+            results = [DealerReview(id=review['id'], car_make=(review['car_make'] if 'car_make' in review else None), car_model=(review['car_model'] if 'car_model' in review else None), car_year=(review['car_year'] if 'car_year' in review else None), dealership=review['dealership'], name=review['name'], purchase=(review['purchase'] if 'purchase' in review else None), purchase_date=(review['purchase_date'] if 'purchase_date' in review else None), review=review['review'], sentiment=analyze_review_sentiments(review['review'])) for review in reviews]
+    return results
 
 # Create an `analyze_review_sentiments` method to call Watson NLU and analyze text
 # def analyze_review_sentiments(text):
 # - Call get_request() with specified arguments
 # - Get the returned sentiment label such as Positive or Negative
-def analyze_review_sentiments(dealer_review):
-    json_data = get_request(
-        url=settings.WNLU_API_URL + "v1/analyze",
-        cp_wnlu_api_key=settings.WNLU_API_KEY,
-        version="2021-03-25",
-        text=dealer_review,
-        features="sentiment",
-        return_analyzed_text=True,
-        # language to be specified in order to deal with short reviews
-        language='en'
-    )
-    return json_data['sentiment']['document']['label']
+def analyze_review_sentiments(text):
+    kwargs = {
+        'text': text,
+        'api_key': os.getenv('API_KEY')
+    }
+    url = os.getenv('API_URL')
+    result = get_request(url + '/v1/analyze', **kwargs)
+    return result['sentiment']['document']['label']
 
-
+def add_review_to_cf(url, json_payload):
+    return post_request(url, json_payload)
