@@ -63,17 +63,62 @@ class CarModel(models.Model):
                "DealerID: " + str(self.dealer_id) + ")"
 
 # <HINT> Create a plain Python class `CarDealer` to hold dealer data
-class CarDealer(models.Model):
-    Name = __name__
-    DealerID = id
-
+class CarDealer:
+    def __init__(self, address, city, full_name, id_val, lat, long_val, state, st, zip_val):
+        # Dealer address
+        self.address = address
+        # Dealer city
+        self.city = city
+        # Dealer Full Name
+        self.full_name = full_name
+        # Dealer id
+        self.id = id_val
+        # Location lat
+        self.lat = lat
+        # Location long
+        self.long = long_val
+        # Dealer short name
+        self.state = state
+        # Dealer state
+        self.st = st
+        # Dealer zip
+        self.zip = zip_val
     def __str__(self):
-        return CarDealer
+        return "Dealer name: " + self.full_name + \
+                ", City: " + self.city + \
+                ", State: " + self.state + \
+                ", st: " + self.st
 
 # <HINT> Create a plain Python class `DealerReview` to hold review data
-class DealerReview(models.Model):
-    Rate = [1, 2, 3, 4, 5]
-    Comment = "Text"
-
+class DealerReview:
+    def __init__(self, id_review, dealership, name, \
+            purchase, review, purchase_date=None, car_make=None, \
+            car_model=None, car_year=None, sentiment=None):
+        # Review id
+        self.id = id_review
+        # Dealership id
+        self.dealership = dealership
+        # Reviewer name
+        self.name = name
+        # Reviewer has purchased
+        self.purchase = purchase
+        # Reviewer review
+        self.review = review
+        # Reviewer purchase date
+        self.purchase_date = purchase_date
+        # Car Make
+        self.car_make = car_make
+        # Car Model
+        self.car_model = car_model
+        # Car Year
+        self.car_year = car_year
+        # Reviewer sentiment
+        self.sentiment = sentiment
     def __str__(self):
-        return DealerReview
+        return "Reviewer name: " + self.name + \
+                ", Dealership: " + str(self.dealership) + \
+                ", Review: " + self.review + \
+                ", Purchase: " + str(self.purchase) + \
+                ", Sentiment: " + str(self.sentiment) + \
+                ", Car Make: " + str(self.car_make) + \
+                ", Car Model: " + str(self.car_model)
