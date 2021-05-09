@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 # Create an `about` view to render a static about page
-def about(request):
+def get_about(request):
     context = {}
     if request.method == "GET":
         return render(request, 'djangoapp/about.html', context)
@@ -26,7 +26,7 @@ def about(request):
 
 
 # Create a `contact` view to return a static contact page
-def contact(request):
+def get_contact(request):
     context = {}
     if request.method == "GET":
         return render(request, 'djangoapp/contact.html', context)
