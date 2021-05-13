@@ -1,11 +1,11 @@
-  applications:
-  - name: dealerreiew
+applications:
+  - name: djangoapp
     routes:
-      - route: aschi.eu-de.mybluemix.net
+      - route: agfzb-CloudAppDevelopment_Capstone.us-south.cf.appdomain.cloud
     memory: 128M
     buildpack: python_buildpack
-  - name: dealerreiew-nginx
+  - name: djangoapp-nginx
     routes:
-      - route: aschi.eu-de.mybluemix.net/static
+      - route: agfzb-CloudAppDevelopment_Capstone.us-south.cf.appdomain.cloud/static
     memory: 128M
     buildpack: staticfile_buildpack
