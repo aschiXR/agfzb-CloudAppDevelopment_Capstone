@@ -1,11 +1,11 @@
 applications:
   - name: djangoapp
     routes:
-      - route: agfzb-CloudAppDevelopment_Capstone.us-south.cf.appdomain.cloud
+      - route: aschiXR.us-south.cf.appdomain.cloud
     memory: 128M
     buildpack: python_buildpack
   - name: djangoapp-nginx
     routes:
-      - route: agfzb-CloudAppDevelopment_Capstone.us-south.cf.appdomain.cloud/static
+      - route: aschiXR.us-south.cf.appdomain.cloud/static
     memory: 128M
     buildpack: staticfile_buildpack
