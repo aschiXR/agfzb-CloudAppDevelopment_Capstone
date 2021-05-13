@@ -77,7 +77,7 @@ def registration_request(request):
 def get_dealerships(request):
     context = {}
     if request.method == 'GET':
-        url = 'https://6133d11d.us-south.apigw.appdomain.cloud/api/dealership'
+        url = '	https://1088d791-5891-4973-962a-8b6c0ad2b288-bluemix.cloudantnosqldb.appdomain.cloud/api/dealership'
         dealerships = get_dealers_from_cf(url, **(request.GET))
         context['dealerships'] = dealerships
         return render(request, 'djangoapp/index.html', context)
@@ -89,10 +89,10 @@ def get_dealerships(request):
 def get_dealer_details(request, dealer_id):
     context = {}
     if request.method == 'GET':
-        url = 'https://6133d11d.us-south.apigw.appdomain.cloud/api/dealership'
+        url = '	https://1088d791-5891-4973-962a-8b6c0ad2b288-bluemix.cloudantnosqldb.appdomain.cloud/api/dealership'
         dealerships = get_dealers_from_cf(url, **({'id':dealer_id}))
         context['dealer'] = dealerships[0]
-        url = 'https://6133d11d.us-south.apigw.appdomain.cloud/api/review'
+        url = '	https://1088d791-5891-4973-962a-8b6c0ad2b288-bluemix.cloudantnosqldb.appdomain.cloud/api/review'
         dealer_reviews = get_dealer_reviews_from_cf(url, dealer_id)
         context['reviews'] = dealer_reviews
         return render(request, 'djangoapp/dealer_details.html', context)
@@ -103,13 +103,13 @@ def get_dealer_details(request, dealer_id):
 def add_review(request, dealer_id):
     context = {}
     if request.method == 'GET':
-        url = 'https://6133d11d.us-south.apigw.appdomain.cloud/api/dealership'
+        url = '	https://1088d791-5891-4973-962a-8b6c0ad2b288-bluemix.cloudantnosqldb.appdomain.cloud/api/dealership'
         dealerships = get_dealers_from_cf(url, **({'id':dealer_id}))
         context['dealer'] = dealerships[0]
         context['cars'] = CarModel.objects.filter(dealer_id=dealer_id)
         return render(request, 'djangoapp/add_review.html', context)
     elif request.method == 'POST':
-        url = 'https://6133d11d.us-south.apigw.appdomain.cloud/api/review'
+        url = '	https://1088d791-5891-4973-962a-8b6c0ad2b288-bluemix.cloudantnosqldb.appdomain.cloud/api/review'
         dealer_reviews = get_dealer_reviews_from_cf(url, dealer_id)
         max_id = max([review.id for review in dealer_reviews], default=100)
         new_id = max_id + 1 if max_id >= 100 else max_id + 100

@@ -1,82 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        {% load static %}
-        <title>Dealership Review</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-        <link href="https://unpkg.com/bootstrap-table@1.18.2/dist/bootstrap-table.min.css" rel="stylesheet">
-        <script src="https://unpkg.com/bootstrap-table@1.18.2/dist/bootstrap-table.min.js"></script>
-        <script src="https://unpkg.com/bootstrap-table@1.18.2/dist/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
-    </head>
+<head>
+    <meta charset="UTF-8">
+    {% load static %}
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
     <body>
-        <!-- nav bar -->
-        <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-            <a class="navbar-brand" href="{% url 'djangoapp:index' %}">Dealership Review</a>
-            <button class="navbar-toggler" data-toggle="collapse" data-target="#navbarMenu">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarMenu">
-                <ul class="navbar-nav">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="{% url 'djangoapp:about' %}">About Us</a>
-                    </li>
-                    <li class="nav-item active">
-                        <a class="nav-link" href="{% url 'djangoapp:contact' %}">Contact Us</a>
-                    </li>
-                </ul>
-                {% if user.is_authenticated %}
-                <a class="ml-auto d-flex btn btn-link" href="#"><b>{{ user.username }}</b></a>
-                <a class="btn btn-link" href="{% url 'djangoapp:logout' %}">Logout</a>
-                {% else %}
-                <form class="ml-auto d-flex" action='{% url 'djangoapp:login' %}' method='POST'>
-                    {% csrf_token %}
-                    <input type="text" class="form-control" placeholder="Username" name="username" >
-                    <input type="password" class="form-control" placeholder="Password" name="psw" >
-                    <button class="btn btn-primary" type="submit">Login</button>
-                    <a class="btn btn-link" href="{% url 'djangoapp:registration' %}">Signup</a>
-                </form> 
-                {% endif %}
+    <!--Add a registration form here -->
+        <!-- Navigation bar -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="{% url 'djangoapp:index' %}">Dealer Review</a>
+                </div>
+                <button class="navbar-toggler" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="nav navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'djangoapp:about' %}">About Us</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'djangoapp:contact' %}">Contact Us</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </nav>
-        
-        <H1>Sign Up</H1></br>
 
-        {% if messages %}
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}" role="alert">
-            <p>{{ message }}</p>
+        <!-- Main content -->
+        <div class="container-fluid m-3">
+            <h2>Sign Up</h2>
+            <form action="{% url 'djangoapp:registration' %}" method="post">
+                {% csrf_token %}
+                {% if message %}
+                <div class="alert alert-warning">
+                    {{ message }}
+                </div>
+                {% endif %}
+                <div class="form-group">
+                    <label for="username"><b>User Name</b></label>
+                    <input id="username" class="form-control" type="text" placeholder="User Name" name="username" required>
+                    <label for="firstname"><b>First Name</b></label>
+                    <input id="firstname" class="form-control" type="text" placeholder="First Name" name="firstname" required>
+                    <label for="lastname"><b>Last Name</b></label>
+                    <input id="lastname" class="form-control" type="text" placeholder="Last Name" name="lastname" required>
+                    <label for="email"><b>Email</b></label>
+                    <input id="email" class="form-control" type="text" placeholder="Email" name="email" required>
+                    <label for="pwd"><b>Password</b></label>
+                    <input id="pwd" class="form-control" type="password"  placeholder="Password" name="pwd" required>
+                    <input type="hidden" name="template_name" value="{{ template_name }}">
+                </div>
+                <button class="btn btn-primary" type="submit">Sign Up</button>
+            </form>
         </div>
-        {% endfor %}
-        {% endif %}
-
-        <form action='{% url 'djangoapp:registration' %}' method='POST'>
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="usernameInput"><b>User Name</b></label>
-                <input type="text" class="form-control" id="usernameInput" placeholder="Enter User Name" name='username'>
-            </div>
-            <div class="form-group">
-                <label for="nameInput"><b>First Name</b></label>
-                <input type="text" class="form-control" id="nameInput" placeholder="Enter First Name" name='firstname'>
-            </div>
-            <div class="form-group">
-                <label for="surnameInput"><b>Last Name</b></label>
-                <input type="text" class="form-control" id="surnameInput" placeholder="Enter Last Name" name='lastname'>
-            </div>
-            <div class="form-group">
-                <label for="passwordInput1"><b>Password</b></label>
-                <input type="password" class="form-control" id="passwordInput1" placeholder="Enter Password" name='psw1'>
-            </div>
-            <div class="form-group">
-                <label for="passwordInput2"><b>Confirm Password</b></label>
-                <input type="password" class="form-control" id="passwordInput2" placeholder="Confirm Password" name='psw2'>
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-            <small id="trustmsg" class="form-text text-muted">we will never share information with anyone else</small>
-        </form>
     </body>
 </html>
