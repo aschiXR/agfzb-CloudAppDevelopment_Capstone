@@ -33,7 +33,7 @@ def login_request(request):
     context = {}
     if request.method == 'POST':
         username = request.POST['username']
-        password = request.POST['pwd']
+        password = request.POST['password']
         template_name = request.POST['template_name']
         user = authenticate(username=username, password=password)
         if user is not None:
