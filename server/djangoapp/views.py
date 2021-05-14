@@ -32,9 +32,9 @@ def contact(request):
 def login_request(request):
     context = {}
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        template_name = request.POST['template_name']
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        template_name = request.POST.get('template_name')
         user = authenticate(username=username, password=password)
         if user is not None:
             login(request, user)
