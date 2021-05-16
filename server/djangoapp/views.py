@@ -13,8 +13,11 @@ import json
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
-
-# Create your views here.
+ibm_cloud_url = ""
+ibm_cloud_api = ""
+post_review_api = ""
+get_reviews_api = ""
+get_dealerships_api = ""
 
 
 # Create an `about` view to render a static about page
